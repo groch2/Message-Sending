@@ -25,12 +25,13 @@
             IAmazonSimpleEmailServiceV2 emailService,
             IMessageSendingConfiguration messageSendingConfiguration,
             IMessageSendingRequestVerifiyer messageSendingRequestVerifiyer,
-            IActionContextAccessor _actionContextAccessor)
+            IActionContextAccessor actionContextAccessor)
         {
             _logger = logger;
             _emailService = emailService;
             emailAddress = messageSendingConfiguration.EmailAddress;
             _messageSendingRequestVerifiyer = messageSendingRequestVerifiyer;
+            _actionContextAccessor = actionContextAccessor;
         }
 
         public async Task<IActionResult> Post([FromBody] MessageSendingRequest messageSendingRequest)

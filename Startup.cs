@@ -1,14 +1,14 @@
-using Amazon.SimpleEmailV2;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Net.Http;
-
 namespace MessageSending
 {
+    using Amazon.SimpleEmailV2;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Mvc.Infrastructure;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using System.Net.Http;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -27,6 +27,8 @@ namespace MessageSending
             services.AddSingleton<IMessageSendingConfiguration, MessageSendingConfiguration>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<IMessageSendingRequestVerifiyer, MessageSendingRequestVerifiyer>();
+            services.AddSingleton<IVerifyServiceConfiguration, VerifyServiceConfiguration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

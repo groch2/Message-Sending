@@ -1,13 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-
-namespace MessageSending
+﻿namespace MessageSending
 {
+    using Microsoft.Extensions.Configuration;
+
     public class MessageSendingConfiguration : IMessageSendingConfiguration
     {
         public MessageSendingConfiguration(IConfiguration configuration)
         {
-            EmailAddress = Environment.GetEnvironmentVariable("emailAddress");
+            EmailAddress = configuration["emailAddress"];
         }
 
         public string EmailAddress { private set; get; }
