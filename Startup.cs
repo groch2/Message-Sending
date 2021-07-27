@@ -1,5 +1,7 @@
 namespace MessageSending
 {
+    using Amazon;
+    using Amazon.SecretsManager;
     using Amazon.SimpleEmailV2;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -7,28 +9,33 @@ namespace MessageSending
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using System.Net.Http;
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public static IConfiguration Configuration { get; private set; }
+        private readonly IWebHostEnvironment _env;
 
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddScoped<IAmazonSimpleEmailServiceV2, AmazonSimpleEmailServiceV2Client>(
-                _ => new AmazonSimpleEmailServiceV2Client(Amazon.RegionEndpoint.EUWest3));
+            services.AddSingleton<IAmazonSimpleEmailServiceV2, AmazonSimpleEmailServiceV2Client>(
+                _ => new AmazonSimpleEmailServiceV2Client(RegionEndpoint.EUWest3));
             services.AddSingleton<IMessageSendingConfiguration, MessageSendingConfiguration>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddSingleton<HttpClient>();
+            services.AddHttpClient(Constants.RecaptchaApiClient, configureClient =>
+                configureClient.BaseAddress = new System.Uri("https://www.google.com/recaptcha/api/"));
             services.AddSingleton<IMessageSendingRequestVerifiyer, MessageSendingRequestVerifiyer>();
             services.AddSingleton<IVerifyServiceConfiguration, VerifyServiceConfiguration>();
+            services.AddSingleton<IAmazonSecretsManager, AmazonSecretsManagerClient>(
+                _ => new AmazonSecretsManagerClient(RegionEndpoint.EUWest3));
+            services.AddSingleton<IEnvironmentConfiguration, EnvironmentConfiguration>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

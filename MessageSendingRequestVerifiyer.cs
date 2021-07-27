@@ -6,14 +6,14 @@
 
     public class MessageSendingRequestVerifiyer : IMessageSendingRequestVerifiyer
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _recaptchaApiClient;
         private readonly string _verifyServiceSecretKey;
 
         public MessageSendingRequestVerifiyer(
-            HttpClient httpClient,
+            IHttpClientFactory httpClientFactory,
             IVerifyServiceConfiguration verifyServiceConfiguration)
         {
-            _httpClient = httpClient;
+            _recaptchaApiClient = httpClientFactory.CreateClient(Constants.RecaptchaApiClient);
             _verifyServiceSecretKey = verifyServiceConfiguration.SecretKey;
         }
 
@@ -26,8 +26,8 @@
                 Remoteip = remoteIPAddress,
             });
             var httpResponse =
-                await _httpClient
-                    .PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
+                await _recaptchaApiClient
+                    .PostAsync("siteverify", content);
             var recaptchaVerifyResponse =
                 await httpResponse.Content
                     .ReadFromJsonAsync<RecaptchaVerifyResponse>();
