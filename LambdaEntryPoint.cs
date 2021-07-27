@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Amazon.Lambda.Core;
-using Newtonsoft.Json;
-using System;
 
 namespace MessageSending
 {
@@ -35,11 +32,6 @@ namespace MessageSending
         protected override void Init(IWebHostBuilder builder)
         {
             builder.UseStartup<Startup>();
-
-            var environmentVariables = Environment.GetEnvironmentVariables();
-            var serializedEnvironmentVariables = JsonConvert.SerializeObject(environmentVariables);
-            var environmentVaribalesLogMessage = $"ENVIRONMENT VARIABLES: {serializedEnvironmentVariables}";
-            LambdaLogger.Log(environmentVaribalesLogMessage);
         }
 
         /// <summary>
