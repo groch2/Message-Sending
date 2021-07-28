@@ -1,5 +1,6 @@
 ﻿namespace MessageSending
 {
+    using Microsoft.Extensions.Logging;
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
@@ -9,13 +10,16 @@
     {
         private readonly HttpClient _recaptchaApiClient;
         private readonly string _verifyServiceSecretKey;
+        private readonly ILogger _logger;
 
         public MessageSendingRequestVerifiyer(
             IHttpClientFactory httpClientFactory,
-            IVerifyServiceConfiguration verifyServiceConfiguration)
+            IVerifyServiceConfiguration verifyServiceConfiguration,
+            ILogger<MessageSendingRequestVerifiyer> logger)
         {
             _recaptchaApiClient = httpClientFactory.CreateClient(Constants.RecaptchaApiClient);
             _verifyServiceSecretKey = verifyServiceConfiguration.SecretKey;
+            _logger = logger;
         }
 
         public async Task<bool> VerifiyMessageSendingRequest(string token, string remoteIPAddress)
@@ -31,13 +35,16 @@
             var httpResponse =
                 await _recaptchaApiClient
                     .PostAsync("siteverify", content);
-#if DEBUG
-            var response = await httpResponse.Content.ReadAsStringAsync();
-            System.Console.WriteLine(response);
-#endif
             var recaptchaVerifyResponse =
                 await httpResponse.Content
                     .ReadFromJsonAsync<RecaptchaVerifyResponse>();
+            if (!recaptchaVerifyResponse.Success)
+            {
+                var request = await content.ReadAsStringAsync();
+                _logger.LogInformation(request);
+                var response = await httpResponse.Content.ReadAsStringAsync();
+                _logger.LogInformation(response);
+            }
             return recaptchaVerifyResponse.Success;
         }
 

@@ -30,7 +30,6 @@
                 SecretId = "MorganSite/RecaptchaSecretKey",
                 VersionStage = "AWSCURRENT"
             };
-
             var secretValueResponse = await _amazonSecretsManagerClient.GetSecretValueAsync(request);
             return secretValueResponse.SecretString;
         }
