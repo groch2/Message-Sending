@@ -1,5 +1,6 @@
 ﻿namespace MessageSending
 {
+    using System.Collections.Generic;
     using System.Net.Http;
     using System.Net.Http.Json;
     using System.Threading.Tasks;
@@ -19,15 +20,21 @@
 
         public async Task<bool> VerifiyMessageSendingRequest(string token, string remoteIPAddress)
         {
-            var content = JsonContent.Create(new RecaptchaVerifyRequest
-            {
-                Secret = _verifyServiceSecretKey,
-                Response = token,
-                Remoteip = remoteIPAddress,
+            var content = new FormUrlEncodedContent(new[] {
+                KeyValuePair.Create("secret", _verifyServiceSecretKey),
+                KeyValuePair.Create("response", token),
+                KeyValuePair.Create("Remoteip", remoteIPAddress)
             });
+            const string contentTypeHeaderKey = "Content-Type";
+            content.Headers.Remove(contentTypeHeaderKey);
+            content.Headers.Add(contentTypeHeaderKey, "application/x-www-form-urlencoded");
             var httpResponse =
                 await _recaptchaApiClient
                     .PostAsync("siteverify", content);
+#if DEBUG
+            var response = await httpResponse.Content.ReadAsStringAsync();
+            System.Console.WriteLine(response);
+#endif
             var recaptchaVerifyResponse =
                 await httpResponse.Content
                     .ReadFromJsonAsync<RecaptchaVerifyResponse>();
