@@ -48,13 +48,6 @@
             return recaptchaVerifyResponse.Success;
         }
 
-        class RecaptchaVerifyRequest
-        {
-            public string Secret { get; set; }
-            public string Response { get; set; }
-            public string Remoteip { get; set; }
-        }
-
         class RecaptchaVerifyResponse
         {
             public bool Success { get; set; }
