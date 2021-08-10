@@ -4,6 +4,6 @@
 
     public interface IMessageSendingRequestVerifiyer
     {
-        Task<bool> VerifiyMessageSendingRequest(string token, string remoteIPAddress);
+        Task<RecaptchaVerifyResponse> VerifiyMessageSendingRequest(string token, string remoteIPAddress);
     }
 }

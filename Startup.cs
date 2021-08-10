@@ -12,14 +12,12 @@ namespace MessageSending
 
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _env = env;
         }
 
         public static IConfiguration Configuration { get; private set; }
-        private readonly IWebHostEnvironment _env;
 
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)

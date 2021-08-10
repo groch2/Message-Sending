@@ -22,12 +22,12 @@
             _logger = logger;
         }
 
-        public async Task<bool> VerifiyMessageSendingRequest(string token, string remoteIPAddress)
+        public async Task<RecaptchaVerifyResponse> VerifiyMessageSendingRequest(string token, string remoteIPAddress)
         {
             var content = new FormUrlEncodedContent(new[] {
                 KeyValuePair.Create("secret", _verifyServiceSecretKey),
                 KeyValuePair.Create("response", token),
-                KeyValuePair.Create("Remoteip", remoteIPAddress)
+                KeyValuePair.Create("remoteip", remoteIPAddress)
             });
             const string contentTypeHeaderKey = "Content-Type";
             content.Headers.Remove(contentTypeHeaderKey);
@@ -40,19 +40,10 @@
                     .ReadFromJsonAsync<RecaptchaVerifyResponse>();
             if (!recaptchaVerifyResponse.Success)
             {
-                var request = await content.ReadAsStringAsync();
-                _logger.LogInformation(request);
                 var response = await httpResponse.Content.ReadAsStringAsync();
                 _logger.LogInformation(response);
             }
-            return recaptchaVerifyResponse.Success;
-        }
-
-        class RecaptchaVerifyResponse
-        {
-            public bool Success { get; set; }
-            public string Challenge_ts { get; set; }
-            public string Hostname { get; set; }
+            return recaptchaVerifyResponse;
         }
     }
 }

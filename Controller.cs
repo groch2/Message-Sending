@@ -4,7 +4,6 @@
     using Amazon.SimpleEmailV2.Model;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
-    using Microsoft.Extensions.Logging;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -14,20 +13,17 @@
     [Route("/")]
     public class Controller : ControllerBase
     {
-        private readonly ILogger _logger;
         private readonly IAmazonSimpleEmailServiceV2 _emailService;
         private readonly string emailAddress;
         private readonly IMessageSendingRequestVerifiyer _messageSendingRequestVerifiyer;
         private readonly IActionContextAccessor _actionContextAccessor;
 
         public Controller(
-            ILogger<Controller> logger,
             IAmazonSimpleEmailServiceV2 emailService,
             IMessageSendingConfiguration messageSendingConfiguration,
             IMessageSendingRequestVerifiyer messageSendingRequestVerifiyer,
             IActionContextAccessor actionContextAccessor)
         {
-            _logger = logger;
             _emailService = emailService;
             emailAddress = messageSendingConfiguration.EmailAddress;
             _messageSendingRequestVerifiyer = messageSendingRequestVerifiyer;
@@ -36,14 +32,13 @@
 
         public async Task<IActionResult> Post([FromBody] MessageSendingRequest messageSendingRequest)
         {
-            _logger.LogInformation(messageSendingRequest.Message.ToString());
             var ipAddress = _actionContextAccessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
-            var isRequestOk =
-                await _messageSendingRequestVerifiyer
+            var recaptchaVerifyResponse =
+                (await _messageSendingRequestVerifiyer
                     .VerifiyMessageSendingRequest(
                         messageSendingRequest.RecaptchaToken,
-                        ipAddress);
-            if (!isRequestOk)
+                        ipAddress));
+            if (!recaptchaVerifyResponse.Success || recaptchaVerifyResponse.Score == 0)
             {
                 return BadRequest();
             }
@@ -77,7 +72,7 @@
                             Text = new Content
                             {
                                 Charset = "UTF-8",
-                                Data = $"{from}{Environment.NewLine}{body}"
+                                Data = $"message from: {from}{Environment.NewLine}{body}"
                             }
                         }
                     }
