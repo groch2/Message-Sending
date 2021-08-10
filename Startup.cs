@@ -29,7 +29,7 @@ namespace MessageSending
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddHttpClient(Constants.RecaptchaApiClient, configureClient =>
                 configureClient.BaseAddress = new System.Uri("https://www.google.com/recaptcha/api/"));
-            services.AddSingleton<IMessageSendingRequestVerifiyer, MessageSendingRequestVerifiyer>();
+            services.AddSingleton<IMessageSendingRequestChecker, MessageSendingRequestChecker>();
             services.AddSingleton<IVerifyServiceConfiguration, VerifyServiceConfiguration>();
             services.AddSingleton<IAmazonSecretsManager, AmazonSecretsManagerClient>(
                 _ => new AmazonSecretsManagerClient(RegionEndpoint.EUWest3));

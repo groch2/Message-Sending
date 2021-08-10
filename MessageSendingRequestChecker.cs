@@ -6,23 +6,23 @@
     using System.Net.Http.Json;
     using System.Threading.Tasks;
 
-    public class MessageSendingRequestVerifiyer : IMessageSendingRequestVerifiyer
+    public class MessageSendingRequestChecker : IMessageSendingRequestChecker
     {
         private readonly HttpClient _recaptchaApiClient;
         private readonly string _verifyServiceSecretKey;
         private readonly ILogger _logger;
 
-        public MessageSendingRequestVerifiyer(
+        public MessageSendingRequestChecker(
             IHttpClientFactory httpClientFactory,
             IVerifyServiceConfiguration verifyServiceConfiguration,
-            ILogger<MessageSendingRequestVerifiyer> logger)
+            ILogger<MessageSendingRequestChecker> logger)
         {
             _recaptchaApiClient = httpClientFactory.CreateClient(Constants.RecaptchaApiClient);
             _verifyServiceSecretKey = verifyServiceConfiguration.SecretKey;
             _logger = logger;
         }
 
-        public async Task<RecaptchaVerifyResponse> VerifiyMessageSendingRequest(string token, string remoteIPAddress)
+        public async Task<RecaptchaVerifyResponse> CheckMessageSendingRequest(string token, string remoteIPAddress)
         {
             var content = new FormUrlEncodedContent(new[] {
                 KeyValuePair.Create("secret", _verifyServiceSecretKey),

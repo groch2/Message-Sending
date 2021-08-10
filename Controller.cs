@@ -15,18 +15,18 @@
     {
         private readonly IAmazonSimpleEmailServiceV2 _emailService;
         private readonly string emailAddress;
-        private readonly IMessageSendingRequestVerifiyer _messageSendingRequestVerifiyer;
+        private readonly IMessageSendingRequestChecker _messageSendingRequestChecker;
         private readonly IActionContextAccessor _actionContextAccessor;
 
         public Controller(
             IAmazonSimpleEmailServiceV2 emailService,
             IMessageSendingConfiguration messageSendingConfiguration,
-            IMessageSendingRequestVerifiyer messageSendingRequestVerifiyer,
+            IMessageSendingRequestChecker messageSendingRequestVerifiyer,
             IActionContextAccessor actionContextAccessor)
         {
             _emailService = emailService;
             emailAddress = messageSendingConfiguration.EmailAddress;
-            _messageSendingRequestVerifiyer = messageSendingRequestVerifiyer;
+            _messageSendingRequestChecker = messageSendingRequestVerifiyer;
             _actionContextAccessor = actionContextAccessor;
         }
 
@@ -34,8 +34,8 @@
         {
             var ipAddress = _actionContextAccessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
             var recaptchaVerifyResponse =
-                (await _messageSendingRequestVerifiyer
-                    .VerifiyMessageSendingRequest(
+                (await _messageSendingRequestChecker
+                    .CheckMessageSendingRequest(
                         messageSendingRequest.RecaptchaToken,
                         ipAddress));
             if (!recaptchaVerifyResponse.Success || recaptchaVerifyResponse.Score == 0)
