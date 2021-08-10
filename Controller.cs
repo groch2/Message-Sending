@@ -38,7 +38,9 @@
                     .CheckMessageSendingRequest(
                         messageSendingRequest.RecaptchaToken,
                         ipAddress));
-            if (!recaptchaVerifyResponse.Success || recaptchaVerifyResponse.Score == 0)
+            if (!recaptchaVerifyResponse.Success ||
+                !string.Equals(recaptchaVerifyResponse.Action, "submit", StringComparison.OrdinalIgnoreCase) ||
+                recaptchaVerifyResponse.Score == 0)
             {
                 return BadRequest();
             }
