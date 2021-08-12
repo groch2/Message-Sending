@@ -1,6 +1,6 @@
 ﻿namespace MessageSending
 {
-    public interface IVerifyServiceConfiguration
+    public interface ICheckerServiceConfiguration
     {
         string SecretKey { get; }
     }

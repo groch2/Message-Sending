@@ -27,10 +27,8 @@ namespace MessageSending
                 _ => new AmazonSimpleEmailServiceV2Client(RegionEndpoint.EUWest3));
             services.AddSingleton<IMessageSendingConfiguration, MessageSendingConfiguration>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddHttpClient(Constants.RecaptchaApiClient, configureClient =>
-                configureClient.BaseAddress = new System.Uri("https://www.google.com/recaptcha/api/"));
-            services.AddSingleton<IMessageSendingRequestChecker, MessageSendingRequestChecker>();
-            services.AddSingleton<IVerifyServiceConfiguration, VerifyServiceConfiguration>();
+            services.AddHttpClient<IMessageSendingRequestChecker, MessageSendingRequestChecker>();
+            services.AddSingleton<ICheckerServiceConfiguration, CheckerServiceConfiguration>();
             services.AddSingleton<IAmazonSecretsManager, AmazonSecretsManagerClient>(
                 _ => new AmazonSecretsManagerClient(RegionEndpoint.EUWest3));
             services.AddSingleton<IEnvironmentConfiguration, EnvironmentConfiguration>();

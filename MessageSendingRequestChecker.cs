@@ -9,30 +9,34 @@
     public class MessageSendingRequestChecker : IMessageSendingRequestChecker
     {
         private readonly HttpClient _recaptchaApiClient;
-        private readonly string _verifyServiceSecretKey;
+        private readonly string _checkerServiceSecretKey;
         private readonly ILogger _logger;
 
         public MessageSendingRequestChecker(
-            IHttpClientFactory httpClientFactory,
-            IVerifyServiceConfiguration verifyServiceConfiguration,
+            HttpClient recaptchaApiClient,
+            ICheckerServiceConfiguration checkerServiceConfiguration,
             ILogger<MessageSendingRequestChecker> logger)
         {
-            _recaptchaApiClient = httpClientFactory.CreateClient(Constants.RecaptchaApiClient);
-            _verifyServiceSecretKey = verifyServiceConfiguration.SecretKey;
+            recaptchaApiClient.BaseAddress =
+                new System.Uri("https://www.google.com/recaptcha/api/");
+            _recaptchaApiClient = recaptchaApiClient;
+            _checkerServiceSecretKey = checkerServiceConfiguration.SecretKey;
             _logger = logger;
         }
 
-        public async Task<RecaptchaVerifyResponse> CheckMessageSendingRequest(string token, string remoteIPAddress)
+        public async Task<RecaptchaVerifyResponse> CheckMessageSendingRequest(
+            string token,
+            string remoteIPAddress)
         {
             var content = new FormUrlEncodedContent(new[] {
-                KeyValuePair.Create("secret", _verifyServiceSecretKey),
+                KeyValuePair.Create("secret", _checkerServiceSecretKey),
                 KeyValuePair.Create("response", token),
                 KeyValuePair.Create("remoteip", remoteIPAddress)
             });
             const string contentTypeHeaderKey = "Content-Type";
             content.Headers.Remove(contentTypeHeaderKey);
             content.Headers.Add(contentTypeHeaderKey, "application/x-www-form-urlencoded");
-            var httpResponse =
+            using var httpResponse =
                 await _recaptchaApiClient
                     .PostAsync("siteverify", content);
             var recaptchaVerifyResponse =
@@ -41,7 +45,7 @@
             if (!recaptchaVerifyResponse.Success)
             {
                 var response = await httpResponse.Content.ReadAsStringAsync();
-                _logger.LogInformation(response);
+                _logger.LogError(response);
             }
             return recaptchaVerifyResponse;
         }

@@ -6,11 +6,11 @@
     using Newtonsoft.Json;
     using System.Threading.Tasks;
 
-    public class VerifyServiceConfiguration : IVerifyServiceConfiguration
+    public class CheckerServiceConfiguration : ICheckerServiceConfiguration
     {
         private readonly IAmazonSecretsManager _amazonSecretsManagerClient;
 
-        public VerifyServiceConfiguration(
+        public CheckerServiceConfiguration(
             IConfiguration configuration,
             IAmazonSecretsManager amazonSecretsManagerClient,
             IEnvironmentConfiguration environmentConfiguration)
@@ -31,8 +31,8 @@
                 SecretId = "MorganSite/RecaptchaSecretKey",
                 VersionStage = "AWSCURRENT"
             };
-            var secretValueResponse = await _amazonSecretsManagerClient.GetSecretValueAsync(request);
-
+            var secretValueResponse =
+                await _amazonSecretsManagerClient.GetSecretValueAsync(request);
             return
                 JsonConvert.DeserializeAnonymousType(
                     secretValueResponse.SecretString, new { RecaptchaSecretKey = "" })
