@@ -29,6 +29,7 @@ namespace MessageSending
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:8080");
+                        builder.AllowAnyHeader();
                     });
             });
             services.AddControllers();
@@ -54,12 +55,7 @@ namespace MessageSending
             app.UseCors();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers().RequireCors(configurePolicy =>
-                {
-                    configurePolicy.WithOrigins("http://localhost:8080");
-                    configurePolicy.AllowAnyMethod();
-                    configurePolicy.AllowAnyHeader();
-                });
+                endpoints.MapControllers();
             });
         }
     }
