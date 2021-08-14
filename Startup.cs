@@ -22,6 +22,15 @@ namespace MessageSending
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    name: Constants.allowSpecificOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:8080");
+                    });
+            });
             services.AddControllers();
             services.AddSingleton<IAmazonSimpleEmailServiceV2, AmazonSimpleEmailServiceV2Client>(
                 _ => new AmazonSimpleEmailServiceV2Client(RegionEndpoint.EUWest3));
@@ -45,14 +54,12 @@ namespace MessageSending
             app.UseCors();
             app.UseEndpoints(endpoints =>
             {
-                endpoints
-                    .MapControllers()
-                    .RequireCors(configure =>
-                    {
-                        configure.AllowAnyHeader();
-                        configure.AllowAnyMethod();
-                        configure.AllowAnyOrigin();
-                    });
+                endpoints.MapControllers().RequireCors(configurePolicy =>
+                {
+                    configurePolicy.WithOrigins("http://localhost:8080");
+                    configurePolicy.AllowAnyMethod();
+                    configurePolicy.AllowAnyHeader();
+                });
             });
         }
     }

@@ -2,6 +2,7 @@
 {
     using Amazon.SimpleEmailV2;
     using Amazon.SimpleEmailV2.Model;
+    using Microsoft.AspNetCore.Cors;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Infrastructure;
     using System;
@@ -30,6 +31,15 @@
             _actionContextAccessor = actionContextAccessor;
         }
 
+        [HttpGet]
+        [EnableCors(Constants.allowSpecificOrigins)]
+        public bool Test()
+        {
+            return true;
+        }
+
+        [HttpPost]
+        [EnableCors(Constants.allowSpecificOrigins)]
         public async Task<IActionResult> Post([FromBody] MessageSendingRequest messageSendingRequest)
         {
             var ipAddress = _actionContextAccessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
@@ -44,11 +54,11 @@
             {
                 return BadRequest();
             }
-            var message = messageSendingRequest.Message;
-            await SendMessage(
-                message.From,
-                message.Subject,
-                message.Body);
+            //var message = messageSendingRequest.Message;
+            //await SendMessage(
+            //    message.From,
+            //    message.Subject,
+            //    message.Body);
             return Ok();
         }
 
