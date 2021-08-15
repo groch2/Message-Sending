@@ -9,6 +9,7 @@ namespace MessageSending
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using System.Linq;
 
     public class Startup
     {
@@ -25,10 +26,15 @@ namespace MessageSending
             services.AddCors(options =>
             {
                 options.AddPolicy(
-                    name: Constants.allowSpecificOrigins,
+                    name: Constants.AllowedOriginsPolicy,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:8080");
+                        var allowedOrigins =
+                            Configuration["AllowedOriginsCommaSeparatedList"]
+                                .Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries)
+                                .Select(url => url.Trim())
+                                .ToArray();
+                        builder.WithOrigins(allowedOrigins);
                         builder.AllowAnyHeader();
                     });
             });

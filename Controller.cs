@@ -32,14 +32,14 @@
         }
 
         [HttpGet]
-        [EnableCors(Constants.allowSpecificOrigins)]
+        [EnableCors(Constants.AllowedOriginsPolicy)]
         public bool Test()
         {
             return true;
         }
 
         [HttpPost]
-        [EnableCors(Constants.allowSpecificOrigins)]
+        [EnableCors(Constants.AllowedOriginsPolicy)]
         public async Task<IActionResult> Post([FromBody] MessageSendingRequest messageSendingRequest)
         {
             var ipAddress = _actionContextAccessor.ActionContext.HttpContext.Connection.RemoteIpAddress.ToString();
@@ -54,11 +54,11 @@
             {
                 return BadRequest();
             }
-            //var message = messageSendingRequest.Message;
-            //await SendMessage(
-            //    message.From,
-            //    message.Subject,
-            //    message.Body);
+            var message = messageSendingRequest.Message;
+            await SendMessage(
+                message.From,
+                message.Subject,
+                message.Body);
             return Ok();
         }
 
